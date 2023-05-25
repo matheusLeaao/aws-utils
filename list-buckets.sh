@@ -12,9 +12,10 @@ for bucket in $buckets; do
     
     # Verifica se existe uma política de lifecycle
     if [[ $(echo $lifecycle | jq -r '.Rules | length') -gt 0 ]]; then
-        # Obtém o nome da política de lifecycle
+        # Obtém o nome e a quantidade de dias de retenção da política de lifecycle
         policy_name=$(echo $lifecycle | jq -r '.Rules[0].ID')
-        echo "Política de Lifecycle: $policy_name"
+        retention_days=$(echo $lifecycle | jq -r '.Rules[0].Expiration.Days')
+        echo "Política de Lifecycle: $policy_name (Retenção: $retention_days dias)"
     else
         echo "Nenhuma política de Lifecycle definida"
     fi
