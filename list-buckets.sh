@@ -21,6 +21,11 @@ for bucket in $buckets; do
     else
         echo "Attached Policy: No"
     fi
+
+    objects=$(aws s3api list-objects --bucket $bucket --output json --query "[length(Contents[])]" 2>/dev/null)
+    size=$(aws s3api list-objects --bucket $bucket --output json --query "Contents[].Size" 2>/dev/null | awk '{s+=$1} END {print s/1024/1024/1024}') # Tamanho em GB
+    echo "Count of Objects: $objects"
+    echo "Size: $size GB"
     
     echo
 done
