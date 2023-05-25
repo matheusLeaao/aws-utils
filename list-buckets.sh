@@ -1,23 +1,25 @@
 #!/bin/bash
 
-# Lista os buckets S3
 buckets=$(aws s3api list-buckets --query "Buckets[].Name" --output text)
 
-# Loop pelos buckets
 for bucket in $buckets; do
     echo "Bucket: $bucket"
     
-    # Obtém a configuração do lifecycle
     lifecycle=$(aws s3api get-bucket-lifecycle-configuration --bucket $bucket --output json 2>/dev/null)
     
-    # Verifica se existe uma política de lifecycle
     if [[ $(echo $lifecycle | jq -r '.Rules | length') -gt 0 ]]; then
-        # Obtém o nome e a quantidade de dias de retenção da política de lifecycle
         policy_name=$(echo $lifecycle | jq -r '.Rules[0].ID')
         retention_days=$(echo $lifecycle | jq -r '.Rules[0].Expiration.Days')
-        echo "Política de Lifecycle: $policy_name (Retenção: $retention_days dias)"
+        echo "Lifecycle Policy: $policy_name (Retention: $retention_days days)"
     else
-        echo "Nenhuma política de Lifecycle definida"
+        echo "No Lifecycle policy defined"
+    fi
+
+    policy=$(aws s3api get-bucket-policy --bucket $bucket --output json 2>/dev/null)
+    if [[ $(echo $policy | jq -r '.Statement | length') -gt 0 ]]; then
+        echo "Attached Policy: Yes"
+    else
+        echo "Attached Policy: No"
     fi
     
     echo
