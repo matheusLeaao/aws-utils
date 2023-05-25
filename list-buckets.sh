@@ -16,7 +16,7 @@ for bucket in $buckets; do
     fi
 
     policy=$(aws s3api get-bucket-policy --bucket $bucket --output json 2>/dev/null)
-    if [[ $(echo $policy | jq -r '.Statement | length') -gt 0 ]]; then
+    if [[ $(echo $policy | jq -r '.Policy | length') -gt 0 ]]; then
         echo "Attached Policy: Yes"
     else
         echo "Attached Policy: No"
